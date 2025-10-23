@@ -136,9 +136,16 @@ function checkForAutoSignIn() {
         console.log('Student mode activated!');
         // Enable student mode - hide header and attendance list
         document.body.classList.add('student-mode');
-        showSignInModal();
-        // Clean up URL without reloading
-        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Show modal after a brief delay to ensure DOM is ready
+        setTimeout(() => {
+            showSignInModal();
+        }, 100);
+
+        // Clean up URL after modal is shown
+        setTimeout(() => {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 200);
     }
 }
 
