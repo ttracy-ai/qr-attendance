@@ -328,7 +328,12 @@ function validateName(name) {
         return { valid: false, errors };
     }
 
-    return { valid: true, errors: [], name: name };
+    // Convert to title case (capitalize first letter of each word)
+    const titleCasedName = words
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+
+    return { valid: true, errors: [], name: titleCasedName };
 }
 
 // Sign In Handler
