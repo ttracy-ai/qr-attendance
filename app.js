@@ -349,9 +349,8 @@ async function handleSignIn(e) {
         period: currentHour
     };
 
-    attendanceData.unshift(entry); // Add to beginning of array
-    await saveAttendanceData(entry); // Save to Firebase
-    renderAttendanceList();
+    // Save to Firebase (real-time listener will update the UI automatically)
+    await saveAttendanceData(entry);
     hideSignInModal();
 
     // Show success feedback
@@ -487,31 +486,40 @@ function getInitials(name) {
         .toUpperCase();
 }
 
-// Data Persistence - Firebase Firestore
+// Data Persistence - Firebase Firestore with Real-time Updates
 async function loadAttendanceData() {
     const today = getTodayKey();
 
     try {
-        const { collection, getDocs, query, orderBy } = window.firebaseModules;
+        const { collection, query, orderBy, onSnapshot } = window.firebaseModules;
         const attendanceRef = collection(window.db, 'attendance');
         const q = query(attendanceRef, orderBy('timestamp', 'desc'));
 
-        const querySnapshot = await getDocs(q);
-        const allEntries = [];
+        // Set up real-time listener
+        onSnapshot(q, (querySnapshot) => {
+            const allEntries = [];
 
-        querySnapshot.forEach((doc) => {
-            allEntries.push({
-                firestoreId: doc.id, // Store Firestore document ID
-                ...doc.data()
+            querySnapshot.forEach((doc) => {
+                allEntries.push({
+                    firestoreId: doc.id, // Store Firestore document ID
+                    ...doc.data()
+                });
             });
+
+            // Load only today's entries into attendanceData
+            attendanceData = allEntries.filter(entry => entry.date === today);
+
+            console.log(`Real-time update: ${attendanceData.length} entries for today`);
+
+            // Re-render the list with new data
+            renderAttendanceList();
+        }, (error) => {
+            console.error('Error in real-time listener:', error);
         });
 
-        // Load only today's entries into attendanceData
-        attendanceData = allEntries.filter(entry => entry.date === today);
-
-        console.log(`Loaded ${attendanceData.length} entries for today from Firebase`);
+        console.log('Real-time listener attached to Firebase');
     } catch (error) {
-        console.error('Error loading attendance data from Firebase:', error);
+        console.error('Error setting up Firebase listener:', error);
         // Fallback to empty array if Firebase fails
         attendanceData = [];
     }
@@ -626,16 +634,12 @@ async function deleteStudent(studentId) {
 
     if (confirmed) {
         try {
-            // Delete from Firebase if we have a Firestore ID
+            // Delete from Firebase (real-time listener will update UI automatically)
             if (student.firestoreId) {
                 const { doc, deleteDoc } = window.firebaseModules;
                 await deleteDoc(doc(window.db, 'attendance', student.firestoreId));
                 console.log('Entry deleted from Firebase');
             }
-
-            // Delete from local array
-            attendanceData = attendanceData.filter(entry => entry.id !== studentId);
-            renderAttendanceList();
 
         } catch (error) {
             console.error('Error deleting entry:', error);
@@ -665,10 +669,7 @@ async function clearAllAttendance() {
 
             await Promise.all(deletePromises);
             console.log(`Deleted ${deletePromises.length} entries from Firebase`);
-
-            // Clear local array
-            attendanceData = [];
-            renderAttendanceList();
+            // Real-time listener will update UI automatically
 
         } catch (error) {
             console.error('Error clearing attendance:', error);
