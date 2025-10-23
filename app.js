@@ -129,7 +129,11 @@ function generateQRCode() {
 // Check if user arrived via QR code scan
 function checkForAutoSignIn() {
     const urlParams = new URLSearchParams(window.location.search);
+    console.log('URL params:', window.location.search);
+    console.log('signin param:', urlParams.get('signin'));
+
     if (urlParams.get('signin') === 'true') {
+        console.log('Student mode activated!');
         // Enable student mode - hide header and attendance list
         document.body.classList.add('student-mode');
         showSignInModal();
