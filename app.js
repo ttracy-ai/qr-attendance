@@ -23,13 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initializeApp() {
-    // Wait for Firebase data to load
-    await loadAttendanceData();
-
-    // TEMPORARY: Force add test students (remove this later)
-    // Clear existing data and add test students
-    // attendanceData = [];
-    // addTestStudents();
+    // Set up real-time Firebase listener (it will render when data arrives)
+    loadAttendanceData();
 
     // Set default hour filter based on current time
     setDefaultHourFilter();
@@ -37,8 +32,9 @@ async function initializeApp() {
     generateQRCode();
     updateDateDisplay();
     updateClock(); // Initial clock update
-    renderAttendanceList();
     checkForAutoSignIn();
+
+    // Note: renderAttendanceList() is called by the Firebase listener
 }
 
 // Set the default hour filter based on current time
@@ -487,8 +483,15 @@ function getInitials(name) {
 }
 
 // Data Persistence - Firebase Firestore with Real-time Updates
-async function loadAttendanceData() {
+function loadAttendanceData() {
     const today = getTodayKey();
+
+    // Wait for Firebase to be ready
+    if (!window.firebaseModules || !window.db) {
+        console.error('Firebase not initialized yet');
+        setTimeout(() => loadAttendanceData(), 100);
+        return;
+    }
 
     try {
         const { collection, query, orderBy, onSnapshot } = window.firebaseModules;
@@ -496,7 +499,7 @@ async function loadAttendanceData() {
         const q = query(attendanceRef, orderBy('timestamp', 'desc'));
 
         // Set up real-time listener
-        onSnapshot(q, (querySnapshot) => {
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const allEntries = [];
 
             querySnapshot.forEach((doc) => {
@@ -518,6 +521,9 @@ async function loadAttendanceData() {
         });
 
         console.log('Real-time listener attached to Firebase');
+
+        // Store unsubscribe function globally in case we need it
+        window.firestoreUnsubscribe = unsubscribe;
     } catch (error) {
         console.error('Error setting up Firebase listener:', error);
         // Fallback to empty array if Firebase fails
