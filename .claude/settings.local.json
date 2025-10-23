@@ -4,7 +4,15 @@
       "Bash(node --version:*)",
       "WebSearch",
       "WebFetch(domain:docs.clockify.me)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: QR Attendance System with Firebase integration\n\n- Complete QR code-based attendance tracking system\n- Firebase Firestore integration for cloud data storage\n- Magic UI-inspired design with Explore EdTech branding\n- Hour-based filtering (1-4) with auto-switching\n- Multi-day data persistence\n- CSV export functionality\n- Individual student deletion\n- Name validation (2 words, no numbers)\n- Mobile-friendly responsive design\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(gh auth:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git commit:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []
