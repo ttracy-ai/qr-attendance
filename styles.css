@@ -36,7 +36,8 @@ body {
 /* Student View - Simplified header and hide main content */
 body.student-mode .header-text,
 body.student-mode .header-stats,
-body.student-mode .container {
+body.student-mode .qr-section,
+body.student-mode .attendance-section {
     display: none;
 }
 
@@ -52,6 +53,15 @@ body.student-mode {
     justify-content: center;
     min-height: 100vh;
     background: linear-gradient(135deg, #0f1419 0%, #1a1f26 100%);
+}
+
+/* Keep modal visible in student mode */
+body.student-mode .modal {
+    display: none; /* Default hidden */
+}
+
+body.student-mode .modal.active {
+    display: flex; /* Show when active */
 }
 
 /* Header */
