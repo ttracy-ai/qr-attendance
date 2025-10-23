@@ -33,6 +33,20 @@ body {
     overflow-x: hidden;
 }
 
+/* Student View - Hide everything except modal when in student mode */
+body.student-mode .app-header,
+body.student-mode .container {
+    display: none;
+}
+
+body.student-mode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f1419 0%, #1a1f26 100%);
+}
+
 /* Header */
 .app-header {
     background: var(--bg-secondary);
@@ -623,6 +637,53 @@ body {
 .modal-subtitle {
     color: var(--text-secondary);
     margin-bottom: 2rem;
+}
+
+/* Success View */
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--accent-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.5s ease;
+}
+
+.success-icon svg {
+    width: 48px;
+    height: 48px;
+    stroke: white;
+    stroke-width: 3;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-message {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+}
+
+#success-view {
+    text-align: center;
+}
+
+#success-view .btn {
+    margin-top: 1rem;
+    width: 100%;
 }
 
 .form-group {

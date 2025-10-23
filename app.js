@@ -130,6 +130,8 @@ function generateQRCode() {
 function checkForAutoSignIn() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('signin') === 'true') {
+        // Enable student mode - hide header and attendance list
+        document.body.classList.add('student-mode');
         showSignInModal();
         // Clean up URL without reloading
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -200,6 +202,7 @@ function setupEventListeners() {
 
     // Modal controls
     document.getElementById('cancel-btn').addEventListener('click', hideSignInModal);
+    document.getElementById('done-btn').addEventListener('click', hideSignInModal);
 
     // Teacher controls
     document.getElementById('export-btn').addEventListener('click', exportToCSV);
@@ -248,6 +251,21 @@ function hideSignInModal() {
     const modal = document.getElementById('signin-modal');
     modal.classList.remove('active');
     clearForm();
+
+    // Reset views
+    document.getElementById('signin-form-view').style.display = 'block';
+    document.getElementById('success-view').style.display = 'none';
+
+    // If in student mode, close the window/tab after a delay
+    if (document.body.classList.contains('student-mode')) {
+        setTimeout(() => {
+            window.close();
+            // If window.close() doesn't work (some browsers block it), show a message
+            setTimeout(() => {
+                document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; padding: 2rem;"><div><h1 style="color: var(--accent-primary); margin-bottom: 1rem;">Thanks!</h1><p style="color: var(--text-secondary);">You can close this tab now.</p></div></div>';
+            }, 100);
+        }, 500);
+    }
 }
 
 function clearForm() {
@@ -347,16 +365,26 @@ async function handleSignIn(e) {
 
     // Save to Firebase (real-time listener will update the UI automatically)
     await saveAttendanceData(entry);
-    hideSignInModal();
 
     // Show success feedback
-    showSuccessAnimation();
+    showSuccessAnimation(validation.name);
 }
 
 // Success Animation
-function showSuccessAnimation() {
-    // You could add a toast notification here
+function showSuccessAnimation(studentName) {
     console.log('Student signed in successfully!');
+
+    // Hide form view, show success view
+    document.getElementById('signin-form-view').style.display = 'none';
+    document.getElementById('success-view').style.display = 'block';
+    document.getElementById('success-name').textContent = studentName;
+
+    // Auto-close after 3 seconds for students
+    if (document.body.classList.contains('student-mode')) {
+        setTimeout(() => {
+            hideSignInModal();
+        }, 3000);
+    }
 }
 
 // Attendance List Rendering
