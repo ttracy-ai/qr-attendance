@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore QR Attendance</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header with Logo -->
+    <header class="app-header">
+        <div class="logo-container">
+            <img src="logo.png" alt="Explore Logo" class="logo" onerror="this.style.display='none'">
+            <div class="header-text">
+                <h1 class="header-title">Explore Orientation Attendance</h1>
+                <p class="header-subtitle">Future • Explore • Options • Possibilities • Careers</p>
+            </div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="header-count">0</div>
+                <div class="stat-label">Present Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-time" id="current-time"></div>
+                <div class="stat-label" id="current-date-header"></div>
+            </div>
+            <div class="header-controls">
+                <button class="btn btn-secondary btn-compact" id="export-btn">Export CSV</button>
+                <button class="btn btn-icon" id="clear-btn" title="Clear All Attendance">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Left Side: QR Code -->
+        <div class="qr-section">
+            <div class="qr-container">
+                <div class="qr-header">
+                    <svg class="qr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <h2 class="qr-title">Scan to Sign In</h2>
+                </div>
+
+                <div class="qr-wrapper">
+                    <div class="qr-decoration qr-decoration-tl"></div>
+                    <div class="qr-decoration qr-decoration-tr"></div>
+                    <div class="qr-decoration qr-decoration-bl"></div>
+                    <div class="qr-decoration qr-decoration-br"></div>
+                    <div id="qr-code"></div>
+                </div>
+
+                <div class="qr-instructions">
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Open camera on your iPad</div>
+                    </div>
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Point at QR code</div>
+                    </div>
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Enter your name</div>
+                    </div>
+                </div>
+
+                <div class="wifi-notice">
+                    <svg class="wifi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                        <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                    </svg>
+                    <span>Make sure you're connected to the classroom WiFi</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Attendance List -->
+        <div class="attendance-section">
+            <div class="attendance-container">
+                <div class="header">
+                    <h2 class="attendance-title">Today's Attendance</h2>
+                    <div class="hour-filters">
+                        <button class="hour-filter-btn active" data-hour="all">All</button>
+                        <button class="hour-filter-btn" data-hour="1">1</button>
+                        <button class="hour-filter-btn" data-hour="2">2</button>
+                        <button class="hour-filter-btn" data-hour="3">3</button>
+                        <button class="hour-filter-btn" data-hour="4">4</button>
+                    </div>
+                </div>
+
+                <div class="attendance-list" id="attendance-list">
+                    <div class="empty-state" id="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <p>No students have signed in yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sign-in Modal (appears after QR scan) -->
+        <div class="modal" id="signin-modal">
+            <div class="modal-content">
+                <h2 class="modal-title">Mark Your Attendance</h2>
+                <p class="modal-subtitle">Enter your first and last name</p>
+
+                <form id="signin-form">
+                    <div class="form-group">
+                        <input
+                            type="text"
+                            id="name-input"
+                            class="input"
+                            placeholder="John Doe"
+                            autocomplete="off"
+                            required
+                        >
+                        <div class="error-message" id="error-message"></div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYISqtri44SzTGJWdKPFVzT0PDZFIhS30",
+            authDomain: "qr-attendance-d6200.firebaseapp.com",
+            projectId: "qr-attendance-d6200",
+            storageBucket: "qr-attendance-d6200.firebasestorage.app",
+            messagingSenderId: "57228188432",
+            appId: "1:57228188432:web:275ec6f32251ed3a11e395",
+            measurementId: "G-VMDTV0H2E7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.db = db;
+        window.firebaseModules = { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy };
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>

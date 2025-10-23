@@ -1,0 +1,23 @@
+LOGO SETUP INSTRUCTIONS
+=======================
+
+To add your EdTech logo to the attendance app:
+
+1. Save your logo image as "logo.png" in this folder
+   (The same folder as index.html)
+
+2. Supported formats:
+   - logo.png (recommended)
+   - logo.jpg
+   - logo.svg
+
+3. Recommended logo size:
+   - Height: 70-100px
+   - Transparent background works best
+
+4. If using a different filename, edit index.html line 13:
+   Change: <img src="logo.png" ...>
+   To:     <img src="your-filename.png" ...>
+
+The logo will appear in the top-left corner of the header
+with your EdTech branding text next to it.
